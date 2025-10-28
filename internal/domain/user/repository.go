@@ -1,9 +1,9 @@
 package user
 
 import (
-	"hrm-app/internal/pkg/database"
 	"errors"
 	"gorm.io/gorm"
+	"hrm-app/internal/pkg/database"
 )
 
 type Repository interface {
@@ -44,15 +44,13 @@ func (r *repository) FindByEmail(email string) (*User, error) {
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			// Jangan return error, biar handler bisa bedain antara "tidak ada data" dan "DB error"
-			return &User{}, nil
+			return nil, nil
 		}
 		return nil, err
 	}
 
 	return &user, nil
 }
-
 
 func (r *repository) Update(user *User) error {
 	return database.DB.Save(user).Error
