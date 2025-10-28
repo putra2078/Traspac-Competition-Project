@@ -44,5 +44,7 @@ func LoadConfig() *Config {
 		log.Fatalf("Unable to decode into struct, %v", err)
 	}
 
+	
+
 	return &cfg
 }
