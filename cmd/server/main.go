@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"hrm-app/config"
 	"hrm-app/internal/app"
+	"hrm-app/internal/domain/contact"
 	"hrm-app/internal/domain/employee"
+	"hrm-app/internal/domain/user"
 	"hrm-app/internal/pkg/database"
 )
 
@@ -17,6 +19,7 @@ func main() {
 	r := app.SetupRouter(cfg)
 	port := fmt.Sprintf(":%d", cfg.Server.Port)
 	// Auto migrate database schemas
-	database.DB.AutoMigrate(&employee.Employee{})
+	// ensure contact table exists as we now create contacts in a transaction
+	database.DB.AutoMigrate(&employee.Employee{}, &contact.Contact{}, &user.User{})
 	r.Run(port)
 }

@@ -1,0 +1,28 @@
+# ======================================
+# 🚀 AIR CONFIG for HRM APP (by Putra)
+# ======================================
+
+# Jalankan file utama
+cmd = "go run ./cmd/server/main.go"
+
+# File hasil build sementara
+bin = "tmp/main.exe"
+
+# Folder yang mau dipantau
+include_dir = [
+  "cmd",
+  "internal",
+  "config"
+]
+
+# Folder yang di-skip
+exclude_dir = [
+  "tmp",
+  "vendor"
+]
+
+# Bersihkan terminal sebelum rebuild
+clear = true
+
+# Delay kecil biar nggak spam rebuild pas save
+delay = 1000 # in milliseconds (1 second)
