@@ -11,11 +11,10 @@ import (
 type Claims struct {
 	UserID uint   `json:"user_id"`
 	Email  string `json:"email"`
-	Role   string `json:"role"`
 	jwt.RegisteredClaims
 }
 
-func GenerateToken(cfg *config.Config, userID uint, email string, role string) (string, error) {
+func GenerateToken(cfg *config.Config, userID uint, email string) (string, error) {
 	expMinutes := cfg.JWT.ExpiresInMinutes
 	if expMinutes == 0 {
 		expMinutes = 60 // fallback default: 1 jam
@@ -24,7 +23,6 @@ func GenerateToken(cfg *config.Config, userID uint, email string, role string) (
 	claims := &Claims{
 		UserID: userID,
 		Email:  email,
-		Role:   role,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Duration(expMinutes) * time.Minute)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
