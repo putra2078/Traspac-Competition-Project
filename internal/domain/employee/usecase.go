@@ -2,11 +2,12 @@ package employee
 
 import (
 	"errors"
-	"time"
+	// "time"
 
 	"hrm-app/internal/domain/contact"
 	"hrm-app/internal/domain/user"
 	"hrm-app/internal/pkg/database"
+	"hrm-app/internal/pkg/utils"
 
 	"gorm.io/gorm"
 )
@@ -36,65 +37,72 @@ func (u *usecase) Register(employee *Employee) error {
 	return u.repo.Create(employee)
 }
 
-// RegisterWithContact creates a contact and employee in a single DB transaction.
-// This implementation uses GORM transaction directly so we don't need to
-// change repository signatures. It guarantees atomicity: either both rows
-// are inserted or none.
-func (u *usecase) RegisterWithContact(emp *Employee, cont *contact.Contact, usr *user.User) error {
+// RegisterWithContact creates a contact, employee, and user in a single DB transaction.
+func (u *usecase) RegisterWithContact(employee *Employee, contact *contact.Contact, user *user.User) error {
 	// simple validation on provided structs
-	if emp == nil || cont == nil || usr == nil {
+	if employee == nil || contact == nil || user == nil {
 		return errors.New("employee or contact is nil")
 	}
 
 	// use GORM transaction to ensure atomicity
 	return database.DB.Transaction(func(tx *gorm.DB) error {
+
 		// check NIP uniqueness within the transaction
-		var existingEmp Employee
-		if err := tx.Where("nip = ?", emp.Nip).First(&existingEmp).Error; err == nil {
-			return errors.New("NIP already in use")
-		} else if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		existingEmployee, err := u.repo.FindByNIP(employee.Nip)
+		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 			return err
+		}
+		if existingEmployee != nil && existingEmployee.ID != 0 {
+			return errors.New("NIP already in use")
 		}
 
 		// check contact email uniqueness within the transaction
-		var existingContact contact.Contact
-		if err := tx.Where("email = ?", cont.Email).First(&existingContact).Error; err == nil {
-			return errors.New("contact email already in use")
-		} else if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-			return err
-		}
+        existingContact, err := u.repo.FindByEmail(contact.Email)
+        if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+            return err
+        }
+        if existingContact != nil && existingContact.ID != 0 {
+            return errors.New("contact email already in use")
+        }
 
 		// create contact
-		if err := tx.Create(cont).Error; err != nil {
-			return err
+		if err := tx.Create(contact).Error; err != nil {
+			return err	
 		}
 
 		// set user name on User and create user and employee
-		usr.Name = cont.Name
+		user.Name = contact.Name
 
 		// set user email on User and create user account
-		usr.Email = cont.Email
+		user.Email = contact.Email
+
+		// hash password before storing
+		hashedPassword, err := utils.HashPassword(user.Password)
+		if err != nil {
+			return err
+		}
+		user.Password = hashedPassword
 
 		// create user
-		if err := tx.Create(usr).Error; err != nil {
+		if err := tx.Create(user).Error; err != nil {
 			return err
 		}
 
 		// set user_id on employee and create employee
-		emp.UserID = usr.ID
+		employee.UserID = user.ID
 
 		// set contact id on employee and create employee
-		emp.ContactID = cont.ID
+		employee.ContactID = contact.ID
 
 		// ensure CreatedAt/UpdatedAt if zero (GORM will handle normally)
-		if emp.CreatedAt.IsZero() {
-			emp.CreatedAt = time.Now()
-		}
-		if cont.CreatedAt.IsZero() {
-			cont.CreatedAt = time.Now()
-		}
+		// if employee.CreatedAt.IsZero() {
+		// 	employee.CreatedAt = time.Now()
+		// }
+		// if contact.CreatedAt.IsZero() {
+		// 	contact.CreatedAt = time.Now()
+		// }
 
-		if err := tx.Create(emp).Error; err != nil {
+		if err := tx.Create(employee).Error; err != nil {
 			return err
 		}
 

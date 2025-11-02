@@ -3,7 +3,9 @@ package app
 import (
 	"hrm-app/config"
 	"hrm-app/internal/domain/auth"
+	"hrm-app/internal/domain/department"
 	"hrm-app/internal/domain/employee"
+	"hrm-app/internal/domain/manager"
 	"hrm-app/internal/domain/user"
 
 	"github.com/gin-gonic/gin"
@@ -28,6 +30,16 @@ func SetupRouter(cfg *config.Config) *gin.Engine {
 		employeeUsecase := employee.NewUseCase(employeeRepo)
 		employeeHandler := employee.NewHandler(employeeUsecase)
 
+		// Manager routes
+		managerRepo := manager.NewRepository()
+		managerUseCase := manager.NewUseCase(managerRepo)
+		managerHandler := manager.NewHandler(managerUseCase)
+
+		// Department routes
+		departmentRepo := department.NewRepository()
+		departmentUseCase := department.NewUseCase(departmentRepo)
+		departmentHandler := department.NewHandler(departmentUseCase)
+
 		// auth handler needs repo + cfg
 		authHandler := auth.NewHandler(userRepo, cfg)
 
@@ -46,6 +58,21 @@ func SetupRouter(cfg *config.Config) *gin.Engine {
 			employee.GET("/", employeeHandler.GetAll)
 			employee.GET("/:id", employeeHandler.GetByID)
 			employee.DELETE("/:id", employeeHandler.Delete)
+		}
+		manager := api.Group("/managers")
+		{
+			manager.POST("/", managerHandler.RegisterWithContact)
+			manager.GET("/", managerHandler.GetAll)
+			manager.GET("/:id", managerHandler.GetByID)
+			manager.DELETE("/:id", managerHandler.Delete)
+		}
+		department := api.Group("/departments")
+		{
+			department.POST("/", departmentHandler.Register)
+			department.GET("/", departmentHandler.GetAll)
+			department.GET("slug/:slug", departmentHandler.GetBySlug)
+			department.GET("/:id", departmentHandler.GetByID)
+			department.DELETE("/:id", departmentHandler.Delete)
 		}
 	}
 

@@ -51,7 +51,7 @@ func (h *Handler) Login(c *gin.Context) {
 		return
 	}
 
-	token, err := utils.GenerateToken(h.cfg, user.ID, user.Email, user.Role)
+	token, err := utils.GenerateToken(h.cfg, user.ID, user.Email)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error":   "InternalServerError",

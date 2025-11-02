@@ -7,7 +7,7 @@ import (
 )
 
 type Repository interface {
-	Create(emp *Employee) error
+	Create(employee *Employee) error
 	FindAll() ([]Employee, error)
 	FindByID(id uint) (*Employee, error)
 	FindByNIP(nip string) (*Employee, error)
@@ -22,8 +22,8 @@ func NewRepository() Repository {
 	return &repository{}
 }
 
-func (r *repository) Create(emp *Employee) error {
-	return database.DB.Create(emp).Error
+func (r *repository) Create(employee *Employee) error {
+	return database.DB.Create(employee).Error
 }
 
 func (r *repository) FindAll() ([]Employee, error) {
