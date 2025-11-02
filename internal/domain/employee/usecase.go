@@ -2,7 +2,7 @@ package employee
 
 import (
 	"errors"
-	"time"
+	// "time"
 
 	"hrm-app/internal/domain/contact"
 	"hrm-app/internal/domain/user"
@@ -95,12 +95,12 @@ func (u *usecase) RegisterWithContact(employee *Employee, contact *contact.Conta
 		employee.ContactID = contact.ID
 
 		// ensure CreatedAt/UpdatedAt if zero (GORM will handle normally)
-		if employee.CreatedAt.IsZero() {
-			employee.CreatedAt = time.Now()
-		}
-		if contact.CreatedAt.IsZero() {
-			contact.CreatedAt = time.Now()
-		}
+		// if employee.CreatedAt.IsZero() {
+		// 	employee.CreatedAt = time.Now()
+		// }
+		// if contact.CreatedAt.IsZero() {
+		// 	contact.CreatedAt = time.Now()
+		// }
 
 		if err := tx.Create(employee).Error; err != nil {
 			return err
