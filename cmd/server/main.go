@@ -6,8 +6,8 @@ import (
 	"hrm-app/internal/app"
 	"hrm-app/internal/domain/contact"
 	"hrm-app/internal/domain/employee"
-	"hrm-app/internal/domain/user"
 	"hrm-app/internal/domain/manager"
+	"hrm-app/internal/domain/user"
 	"hrm-app/internal/pkg/database"
 )
 

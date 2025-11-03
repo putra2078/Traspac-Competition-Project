@@ -40,10 +40,10 @@ type EmployeeWithContactRequest struct {
 	} `json:"contact" binding:"required"`
 
 	User struct {
-	Name		string    `json:"name"`
-	Email   	string    `json:"email" gorm:"uniqueIndex"`
-	Password 	string   `json:"password"`
-	Role    	string    `json:"role"`
+		Name     string `json:"name"`
+		Email    string `json:"email" gorm:"uniqueIndex"`
+		Password string `json:"password"`
+		Role     string `json:"role"`
 	} `json:"user" binding:"required"`
 }
 
@@ -100,8 +100,8 @@ func (h *Handler) RegisterWithContact(c *gin.Context) {
 	}
 
 	user := &user.User{
-		Password: 	req.User.Password,
-		Role:		req.User.Role,
+		Password: req.User.Password,
+		Role:     req.User.Role,
 	}
 
 	if err := h.usecase.RegisterWithContact(employee, contact, user); err != nil {

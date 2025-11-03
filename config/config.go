@@ -11,22 +11,22 @@ type Config struct {
 		Port int
 	}
 	Database struct {
-		Host	 string
-		Port	 int
-		User	 string
+		Host     string
+		Port     int
+		User     string
 		Password string
-		Name	 string
-		Sslmode	 string
+		Name     string
+		Sslmode  string
 	}
 	Redis struct {
 		Host     string
 		Port     int
 		Password string
-		Db      int
+		Db       int
 	}
 	JWT struct {
-		Secret 				string `mapstructure:"secret"`
-		ExpiresInMinutes 	int    `mapstructure:"expires_in_minute"`
+		Secret           string `mapstructure:"secret"`
+		ExpiresInMinutes int    `mapstructure:"expires_in_minute"`
 	}
 }
 
@@ -43,8 +43,6 @@ func LoadConfig() *Config {
 	if err := viper.Unmarshal(&cfg); err != nil {
 		log.Fatalf("Unable to decode into struct, %v", err)
 	}
-
-	
 
 	return &cfg
 }

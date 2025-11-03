@@ -1,9 +1,9 @@
 package employee
 
 import (
-	"hrm-app/internal/pkg/database"
 	"errors"
 	"gorm.io/gorm"
+	"hrm-app/internal/pkg/database"
 )
 
 type Repository interface {
@@ -65,7 +65,6 @@ func (r *repository) FindByEmail(email string) (*Employee, error) {
 
 	return &employee, nil
 }
-
 
 func (r *repository) Update(employee *Employee) error {
 	return database.DB.Save(employee).Error

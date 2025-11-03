@@ -1,8 +1,8 @@
 package department
 
 import (
-	"hrm-app/internal/pkg/database"
 	"errors"
+	"hrm-app/internal/pkg/database"
 
 	"gorm.io/gorm"
 )
@@ -16,7 +16,7 @@ type Repository interface {
 	Delete(id uint) error
 }
 
-type repository struct {}
+type repository struct{}
 
 func NewRepository() Repository {
 	return &repository{}

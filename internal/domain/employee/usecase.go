@@ -57,17 +57,17 @@ func (u *usecase) RegisterWithContact(employee *Employee, contact *contact.Conta
 		}
 
 		// check contact email uniqueness within the transaction
-        existingContact, err := u.repo.FindByEmail(contact.Email)
-        if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-            return err
-        }
-        if existingContact != nil && existingContact.ID != 0 {
-            return errors.New("contact email already in use")
-        }
+		existingContact, err := u.repo.FindByEmail(contact.Email)
+		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+			return err
+		}
+		if existingContact != nil && existingContact.ID != 0 {
+			return errors.New("contact email already in use")
+		}
 
 		// create contact
 		if err := tx.Create(contact).Error; err != nil {
-			return err	
+			return err
 		}
 
 		// set user name on User and create user and employee

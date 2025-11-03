@@ -1,11 +1,10 @@
 package contact
 
 import (
-	"hrm-app/internal/pkg/database"
 	"errors"
 	"gorm.io/gorm"
+	"hrm-app/internal/pkg/database"
 )
-
 
 type Repository interface {
 	Create(contact *Contact) error

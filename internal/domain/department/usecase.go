@@ -12,7 +12,7 @@ type UseCase interface {
 	DeleteByID(id uint) error
 }
 
-type usecase struct{
+type usecase struct {
 	repo Repository
 }
 
@@ -44,4 +44,3 @@ func (u *usecase) GetBySlug(slug string) (*Department, error) {
 func (u *usecase) DeleteByID(id uint) error {
 	return u.repo.Delete(id)
 }
-

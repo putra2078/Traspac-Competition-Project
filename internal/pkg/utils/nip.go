@@ -1,9 +1,9 @@
 package utils
 
 import (
-	"time"
-	"math/rand"
 	"fmt"
+	"math/rand"
+	"time"
 )
 
 func GenerateNIPWithPrefix(prefix string) string {
