@@ -3,8 +3,9 @@ package database
 import (
 	"context"
 	"fmt"
-	"hrm-app/config"
 	"log"
+
+	"hrm-app/config"
 
 	"github.com/redis/go-redis/v9"
 )

@@ -2,6 +2,7 @@ package department
 
 import (
 	"errors"
+
 	"hrm-app/internal/pkg/database"
 
 	"gorm.io/gorm"
@@ -42,7 +43,6 @@ func (r *repository) FindByID(id uint) (*Department, error) {
 func (r *repository) FindBySlug(slug string) (*Department, error) {
 	var department Department
 	err := database.DB.Where("slug = ?", slug).First(&department).Error
-
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return &Department{}, nil

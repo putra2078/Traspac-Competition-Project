@@ -2,6 +2,7 @@ package employee
 
 import (
 	"errors"
+
 	"gorm.io/gorm"
 	"hrm-app/internal/pkg/database"
 )
@@ -54,7 +55,6 @@ func (r *repository) FindByNIP(nip string) (*Employee, error) {
 func (r *repository) FindByEmail(email string) (*Employee, error) {
 	var employee Employee
 	err := database.DB.Where("email = ?", email).First(&employee).Error
-
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			// Jangan return error, biar handler bisa bedain antara "tidak ada data" dan "DB error"

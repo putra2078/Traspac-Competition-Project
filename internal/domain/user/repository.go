@@ -2,6 +2,7 @@ package user
 
 import (
 	"errors"
+
 	"gorm.io/gorm"
 	"hrm-app/internal/pkg/database"
 )
@@ -41,7 +42,6 @@ func (r *repository) FindByID(id uint) (*User, error) {
 func (r *repository) FindByEmail(email string) (*User, error) {
 	var user User
 	err := database.DB.Where("email = ?", email).First(&user).Error
-
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil

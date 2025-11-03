@@ -2,6 +2,7 @@ package contact
 
 import (
 	"errors"
+
 	"gorm.io/gorm"
 	"hrm-app/internal/pkg/database"
 )
@@ -24,7 +25,6 @@ func (r *repository) Create(contact *Contact) error {
 func (r *repository) FindByEmail(email string) (*Contact, error) {
 	var contact Contact
 	err := database.DB.Where("email = ?", email).First(&contact).Error
-
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			// Jangan return error, biar handler bisa bedain antara "tidak ada data" dan "DB error"

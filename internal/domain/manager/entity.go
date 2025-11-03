@@ -1,8 +1,9 @@
 package manager
 
 import (
-	"hrm-app/internal/domain/contact"
 	"time"
+
+	"hrm-app/internal/domain/contact"
 )
 
 type Manager struct {

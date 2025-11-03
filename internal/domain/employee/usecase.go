@@ -46,7 +46,6 @@ func (u *usecase) RegisterWithContact(employee *Employee, contact *contact.Conta
 
 	// use GORM transaction to ensure atomicity
 	return database.DB.Transaction(func(tx *gorm.DB) error {
-
 		// check NIP uniqueness within the transaction
 		existingEmployee, err := u.repo.FindByNIP(employee.Nip)
 		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {

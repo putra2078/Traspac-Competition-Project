@@ -1,9 +1,9 @@
 package department
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
-	"errors"
 
 	"hrm-app/internal/response"
 
@@ -84,13 +84,13 @@ func (h *Handler) Delete(c *gin.Context) {
 
 	err = h.usecase.DeleteByID(uint(id))
 	if err != nil {
-        if errors.Is(err, gorm.ErrRecordNotFound) {
-            response.Error(c, http.StatusNotFound, "Data not found")
-            return
-        }
-        response.Error(c, http.StatusInternalServerError, "failed to delete record")
-        return
-    }
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			response.Error(c, http.StatusNotFound, "Data not found")
+			return
+		}
+		response.Error(c, http.StatusInternalServerError, "failed to delete record")
+		return
+	}
 
 	response.DeleteSuccess(c, "Manager deleted successfully")
 }
