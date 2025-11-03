@@ -1,5 +1,8 @@
 name: CI/CD Pipeline
 
+permissions:
+  contents: write
+
 on:
   pull_request:
     branches: [main]
@@ -45,6 +48,60 @@ jobs:
       - name: Install dependencies
         run: go mod download
 
+      # 🧹 Auto-format step: memperbaiki format code otomatis dan push ke branch PR
+      - name: Auto-format Go code and push (if changes)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "🔍 Running gofmt..."
+          gofmt -s -w .
+
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "✅ No formatting changes."
+            exit 0
+          fi
+
+          echo "🪄 Formatting changed files, committing..."
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "chore: auto-format code (gofmt) [skip ci]"
+
+          # Ensure we have full history and can rebase onto remote branch
+          git fetch origin +refs/heads/*:refs/remotes/origin/*
+
+          # determine target branch to push to:
+          BRANCH="${{ github.head_ref }}"
+          # fallback to ref_name (for push events)
+          if [ -z "$BRANCH" ]; then
+            BRANCH="${{ github.ref_name }}"
+          fi
+
+          if [ -z "$BRANCH" ]; then
+            echo "Could not determine branch name to push to. Exiting."
+            exit 1
+          fi
+
+          # Checkout the branch so we are not in detached HEAD
+          git checkout -B "$BRANCH"
+
+          # Rebase local changes onto latest remote branch to get a fast-forward push
+          if git rev-parse --verify "origin/${BRANCH}" >/dev/null 2>&1; then
+            echo "Rebasing onto origin/${BRANCH}..."
+            if ! git rebase "origin/${BRANCH}"; then
+              echo "Rebase failed — aborting rebase and exiting (remote has diverged)."
+              git rebase --abort || true
+              exit 1
+            fi
+          else
+            echo "No origin/${BRANCH} found, will push new branch."
+          fi
+
+          # Push (fast-forward). Use token auth via remote url
+          echo "Pushing changes to branch ${BRANCH}..."
+          git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git" HEAD:${BRANCH}
+
+
       - name: Build
         run: go build -v ./...
 
@@ -57,6 +114,8 @@ jobs:
             echo "These files are not formatted properly:"
             gofmt -l .
             exit 1
+          else
+            echo "✅ Code formatting check passed!"
           fi
 
   security-scan:
@@ -76,5 +135,5 @@ jobs:
   #   runs-on: ubuntu-latest
   #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
   #   steps:
-  #   - name: Deploy to production
-  #     run: echo "Add your deployment steps here"
+  #     - name: Deploy to production
+  #       run: echo "Add your deployment steps here"
