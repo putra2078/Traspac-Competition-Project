@@ -92,14 +92,13 @@ func main() {
 	// --- Server Configuration ---
 	port := fmt.Sprintf(":%d", cfg.Server.Port)
 	srv := &http.Server{
-    Addr:              port,
-    Handler:           r,
-    ReadHeaderTimeout: 5 * time.Second, // ⏳ Timeout untuk membaca header
-    ReadTimeout:       15 * time.Second, // batas waktu baca body
-    WriteTimeout:      15 * time.Second, // batas waktu tulis respons
-    IdleTimeout:       60 * time.Second, // waktu idle maksimum
-}
-
+		Addr:              port,
+		Handler:           r,
+		ReadHeaderTimeout: 5 * time.Second,  // ⏳ Timeout untuk membaca header
+		ReadTimeout:       15 * time.Second, // batas waktu baca body
+		WriteTimeout:      15 * time.Second, // batas waktu tulis respons
+		IdleTimeout:       60 * time.Second, // waktu idle maksimum
+	}
 
 	// Jalankan server di goroutine agar bisa shutdown dengan elegan
 	go func() {
