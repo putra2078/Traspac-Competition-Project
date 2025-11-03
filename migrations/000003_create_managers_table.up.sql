@@ -1,0 +1,11 @@
+CREATE TABLE IF NOT EXISTS managers (
+    id SERIAL PRIMARY,
+    user_id REFERENCES INTEGER users(id),
+    nip VARCHAR(15) NOT NULL UNIQUE,
+    status VARCHAR(15) NOT NULL,
+    contact_id REFERENCES INTEGER contacts(id),
+    position_id INT NULL,
+    department_id INT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+)
