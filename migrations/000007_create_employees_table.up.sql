@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS employees (
-    id SERIAL PRIMARY,
+    id SERIAL PRIMARY KEY,
     user_id REFERENCES INTEGER users(id),
     nip VARCHAR(15) NOT NULL UNIQUE,
     status VARCHAR(15) NOT NULL,
