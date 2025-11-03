@@ -1,10 +1,14 @@
 package user
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 
+	"hrm-app/internal/response"
+
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 type Handler struct {
@@ -41,23 +45,41 @@ func (h *Handler) GetAll(c *gin.Context) {
 }
 
 func (h *Handler) GetByID(c *gin.Context) {
-	id, _ := strconv.Atoi(c.Param("id"))
-	data, err := h.usecase.GetByID(uint(id))
-	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+	idParam := c.Param("id")
+
+	id, err := strconv.Atoi(idParam)
+	if err != nil || id < 0 {
+		response.Error(c, http.StatusBadRequest, "Invalid id parameter")
 		return
 	}
 
-	c.JSON(http.StatusOK, data)
+	data, err := h.usecase.GetByID(uint(id))
+	if err != nil {
+		response.Error(c, http.StatusNotFound, "User not found")
+		return
+	}
+
+	response.Success(c, data)
 }
 
 func (h *Handler) Delete(c *gin.Context) {
-	id, _ := strconv.Atoi(c.Param("id"))
-	err := h.usecase.DeleteByID(uint(id))
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	idParam := c.Param("id")
+	id, err := strconv.Atoi(idParam)
+	// Check is the id parameter is not a negative int
+	if err != nil || id < 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid id parameter"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "User deleted successfully"})
+	err = h.usecase.DeleteByID(uint(id))
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "data not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to delete record"})
+		return
+	}
+
+	response.DeleteSuccess(c, "User deleted successfully")
 }

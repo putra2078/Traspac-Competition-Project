@@ -2,9 +2,10 @@ package database
 
 import (
 	"fmt"
-	"hrm-app/config"
 	"log"
 	"time"
+
+	"hrm-app/config"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

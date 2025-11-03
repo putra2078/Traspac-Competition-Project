@@ -3,8 +3,9 @@ package database
 import (
 	"context"
 	"fmt"
-	"hrm-app/config"
 	"log"
+
+	"hrm-app/config"
 
 	"github.com/redis/go-redis/v9"
 )
@@ -13,9 +14,9 @@ var RDB *redis.Client
 
 func ConnectRedis(cfg *config.Config) {
 	RDB = redis.NewClient(&redis.Options{
-		Addr:    fmt.Sprintf("%s:%d", cfg.Redis.Host, cfg.Redis.Port),
+		Addr:     fmt.Sprintf("%s:%d", cfg.Redis.Host, cfg.Redis.Port),
 		Password: cfg.Redis.Password,
-		DB:      cfg.Redis.Db,
+		DB:       cfg.Redis.Db,
 	})
 
 	if err := RDB.Ping(context.Background()).Err(); err != nil {

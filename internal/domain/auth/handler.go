@@ -3,9 +3,9 @@ package auth
 import (
 	"net/http"
 
+	"hrm-app/config"
 	"hrm-app/internal/domain/user"
 	"hrm-app/internal/pkg/utils"
-	"hrm-app/config"
 
 	"github.com/gin-gonic/gin"
 )

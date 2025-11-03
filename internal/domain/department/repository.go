@@ -1,8 +1,9 @@
 package department
 
 import (
-	"hrm-app/internal/pkg/database"
 	"errors"
+
+	"hrm-app/internal/pkg/database"
 
 	"gorm.io/gorm"
 )
@@ -16,7 +17,7 @@ type Repository interface {
 	Delete(id uint) error
 }
 
-type repository struct {}
+type repository struct{}
 
 func NewRepository() Repository {
 	return &repository{}
@@ -42,7 +43,6 @@ func (r *repository) FindByID(id uint) (*Department, error) {
 func (r *repository) FindBySlug(slug string) (*Department, error) {
 	var department Department
 	err := database.DB.Where("slug = ?", slug).First(&department).Error
-
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return &Department{}, nil

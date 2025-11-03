@@ -2,6 +2,7 @@ package user
 
 import (
 	"errors"
+
 	"hrm-app/internal/pkg/utils"
 )
 

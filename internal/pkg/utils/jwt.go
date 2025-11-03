@@ -3,6 +3,7 @@ package utils
 import (
 	"errors"
 	"time"
+
 	"hrm-app/config"
 
 	"github.com/golang-jwt/jwt/v5"

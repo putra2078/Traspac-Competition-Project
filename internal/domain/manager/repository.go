@@ -1,9 +1,10 @@
 package manager
 
 import (
-	"hrm-app/internal/pkg/database"
 	"errors"
+
 	"gorm.io/gorm"
+	"hrm-app/internal/pkg/database"
 )
 
 type Repository interface {
@@ -54,7 +55,6 @@ func (r *repository) FindByNIP(nip string) (*Manager, error) {
 func (r *repository) FindByEmail(email string) (*Manager, error) {
 	var managers Manager
 	err := database.DB.Where("email = ?", email).First(&managers).Error
-
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			// Jangan return error, biar handler bisa bedain antara "tidak ada data" dan "DB error"
@@ -65,7 +65,6 @@ func (r *repository) FindByEmail(email string) (*Manager, error) {
 
 	return &managers, nil
 }
-
 
 func (r *repository) Update(Manager *Manager) error {
 	return database.DB.Save(Manager).Error

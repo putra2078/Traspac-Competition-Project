@@ -1,14 +1,17 @@
 package manager
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 	"time"
 
 	"hrm-app/internal/domain/contact"
 	"hrm-app/internal/domain/user"
+	"hrm-app/internal/response"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 type Handler struct {
@@ -39,10 +42,10 @@ type ManagerWithContactRequest struct {
 	} `json:"contact" binding:"required"`
 
 	User struct {
-	Name		string    `json:"name"`
-	Email   	string    `json:"email" gorm:"uniqueIndex"`
-	Password 	string    `json:"password"`
-	Role    	string    `json:"role"`
+		Name     string `json:"name"`
+		Email    string `json:"email" gorm:"uniqueIndex"`
+		Password string `json:"password"`
+		Role     string `json:"role"`
 	} `json:"user" binding:"required"`
 }
 
@@ -98,8 +101,8 @@ func (h *Handler) RegisterWithContact(c *gin.Context) {
 	}
 
 	user := &user.User{
-		Password: 	req.User.Password,
-		Role: 		req.User.Role,
+		Password: req.User.Password,
+		Role:     req.User.Role,
 	}
 
 	if err := h.usecase.RegisterWithContact(manager, contactManager, user); err != nil {
@@ -122,23 +125,41 @@ func (h *Handler) GetAll(c *gin.Context) {
 }
 
 func (h *Handler) GetByID(c *gin.Context) {
-	id, _ := strconv.Atoi(c.Param("id"))
-	data, err := h.usecase.GetByID(uint(id))
-	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Manager not found"})
+	idParam := c.Param("id")
+
+	id, err := strconv.Atoi(idParam)
+	if err != nil || id < 0 {
+		response.Error(c, http.StatusBadRequest, "Invalid id parameter")
 		return
 	}
 
-	c.JSON(http.StatusOK, data)
+	data, err := h.usecase.GetByID(uint(id))
+	if err != nil {
+		response.Error(c, http.StatusNotFound, "User not found")
+		return
+	}
+
+	response.Success(c, data)
 }
 
 func (h *Handler) Delete(c *gin.Context) {
-	id, _ := strconv.Atoi(c.Param("id"))
-	err := h.usecase.DeleteByID(uint(id))
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	idParam := c.Param("id")
+	id, err := strconv.Atoi(idParam)
+	// Check is the id parameter is not a negative int
+	if err != nil || id < 0 {
+		response.Error(c, http.StatusBadRequest, "Invalid id parameter")
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Manager deleted successfully"})
+	err = h.usecase.DeleteByID(uint(id))
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			response.Error(c, http.StatusNotFound, "Data not found")
+			return
+		}
+		response.Error(c, http.StatusInternalServerError, "failed to delete record")
+		return
+	}
+
+	response.DeleteSuccess(c, "Manager deleted successfully")
 }
