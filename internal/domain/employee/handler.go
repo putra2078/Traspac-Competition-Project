@@ -83,7 +83,7 @@ func (h *Handler) RegisterWithContact(c *gin.Context) {
 		}
 	}
 
-	contact := &contact.Contact{
+	contactEmployee := &contact.Contact{
 		Name:        req.Contact.Name,
 		Photo:       req.Contact.Photo,
 		Email:       req.Contact.Email,
@@ -107,7 +107,7 @@ func (h *Handler) RegisterWithContact(c *gin.Context) {
 		Role:     req.User.Role,
 	}
 
-	if err := h.usecase.RegisterWithContact(employee, contact, user); err != nil {
+	if err := h.usecase.RegisterWithContact(employee, contactEmployee, user); err != nil {
 		// choose response code depending on error - for simplicity return 409 for conflicts
 		c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
 		return

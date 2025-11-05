@@ -38,9 +38,9 @@ func (u *usecase) Register(employee *Employee) error {
 }
 
 // RegisterWithContact creates a contact, employee, and user in a single DB transaction.
-func (u *usecase) RegisterWithContact(employee *Employee, contact *contact.Contact, user *user.User) error {
+func (u *usecase) RegisterWithContact(employee *Employee, contactEmployee *contact.Contact, user *user.User) error {
 	// simple validation on provided structs
-	if employee == nil || contact == nil || user == nil {
+	if employee == nil || contactEmployee == nil || user == nil {
 		return errors.New("employee or contact is nil")
 	}
 
@@ -56,24 +56,18 @@ func (u *usecase) RegisterWithContact(employee *Employee, contact *contact.Conta
 		}
 
 		// check contact email uniqueness within the transaction
-		existingContact, err := u.repo.FindByEmail(contact.Email)
-		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-			return err
-		}
-		if existingContact != nil && existingContact.ID != 0 {
-			return errors.New("contact email already in use")
-		}
-
-		// create contact
-		if err := tx.Create(contact).Error; err != nil {
+		existingContact := &contact.Contact{}
+		if err := tx.Where("email = ?", contactEmployee.Email).First(existingContact).Error; err == nil {
+			return errors.New("Email already in use")
+		} else if !errors.Is(err, gorm.ErrRecordNotFound) {
 			return err
 		}
 
 		// set user name on User and create user and employee
-		user.Name = contact.Name
+		user.Name = contactEmployee.Name
 
 		// set user email on User and create user account
-		user.Email = contact.Email
+		user.Email = contactEmployee.Email
 
 		// hash password before storing
 		hashedPassword, err := utils.HashPassword(user.Password)
@@ -91,7 +85,7 @@ func (u *usecase) RegisterWithContact(employee *Employee, contact *contact.Conta
 		employee.UserID = user.ID
 
 		// set contact id on employee and create employee
-		employee.ContactID = contact.ID
+		employee.ContactID = contactEmployee.ID
 
 		// ensure CreatedAt/UpdatedAt if zero (GORM will handle normally)
 		// if employee.CreatedAt.IsZero() {
