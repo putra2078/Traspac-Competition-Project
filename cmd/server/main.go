@@ -39,11 +39,11 @@ import (
 
 	"hrm-app/config"
 	"hrm-app/internal/app"
-	"hrm-app/internal/domain/contact"
-	"hrm-app/internal/domain/department"
-	"hrm-app/internal/domain/employee"
-	"hrm-app/internal/domain/manager"
-	"hrm-app/internal/domain/user"
+	// "hrm-app/internal/domain/contact"
+	// "hrm-app/internal/domain/department"
+	// "hrm-app/internal/domain/employee"
+	// "hrm-app/internal/domain/manager"
+	// "hrm-app/internal/domain/user"
 	"hrm-app/internal/pkg/database"
 
 	"github.com/gin-gonic/gin"
@@ -56,7 +56,7 @@ func main() {
 	// Set Gin mode (default: release untuk production)
 	mode := os.Getenv("GIN_MODE")
 	if mode == "" {
-		mode = "development" // default ke production-safe mode
+		mode = "debug" // default ke production-safe mode
 	}
 	gin.SetMode(mode)
 
@@ -69,21 +69,21 @@ func main() {
 	// database.ConnectRedis(cfg)
 	// log.Println("[INFO] Redis connected successfully")
 
-	// --- Auto Migration (hanya di mode development) ---
-	if gin.Mode() == gin.DebugMode {
-		log.Println("[INFO] Running auto migration (development mode only)...")
-		err := database.DB.AutoMigrate(
-			&employee.Employee{},
-			&contact.Contact{},
-			&user.User{},
-			&manager.Manager{},
-			&department.Department{},
-		)
-		if err != nil {
-			log.Fatalf("[ERROR] Migration failed: %v", err)
-		}
-		log.Println("[INFO] Auto migration completed successfully")
-	}
+	// --- Auto Migration (hanya di mode debug) ---
+	// if gin.Mode() == gin.DebugMode {
+	// 	log.Println("[INFO] Running auto migration (debug mode only)...")
+	// 	err := database.DB.AutoMigrate(
+	// 		&employee.Employee{},
+	// 		&contact.Contact{},
+	// 		&user.User{},
+	// 		&manager.Manager{},
+	// 		&department.Department{},
+	// 	)
+	// 	if err != nil {
+	// 		log.Fatalf("[ERROR] Migration failed: %v", err)
+	// 	}
+	// 	log.Println("[INFO] Auto migration completed successfully")
+	// }
 
 	// --- Setup Gin Router ---
 	r := app.SetupRouter(cfg)

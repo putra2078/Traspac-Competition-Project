@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS managers (
     id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL REFERENCES users(id),
-    nip VARCHAR(15) NOT NULL UNIQUE,
+    nip TEXT UNIQUE NOT NULL,
     status VARCHAR(15) NOT NULL,
     contact_id INTEGER REFERENCES contacts(id),
     position_id INT NULL,

@@ -19,6 +19,20 @@ migrate-force:
 migrate-create:
 	migrate create -ext sql -dir $(MIGRATION_PATH) -seq $(name)
 
+# Membuat folder domain baru dengan file entity, handler, repository, dan usecase
+# Command: make domain name=users
+domain:
+	@if not defined name ( \
+		echo ❌ Tolong isi nama domain, contoh: make domain name=users \
+	) else ( \
+		mkdir internal\domain\$(name) 2>nul && \
+		(for %%f in (entity handler repository usecase) do ( \
+			echo package $(name)>internal\domain\$(name)\%%f.go \
+		)) && \
+		echo ✅ Domain '$(name)' berhasil dibuat di internal\domain\$(name) \
+	)
+
+
 # Menjalankan aplikasi
 run:
 	go run cmd/server/main.go
