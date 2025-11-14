@@ -55,7 +55,6 @@ func (u *usecase) RegisterWithContact(admin *Admin, contactAdmin *contact.Contac
 			return err
 		}
 
-
 		admin.UserID = userAdmin.ID
 		admin.ContactID = contactAdmin.ID
 		if err := tx.Create(admin).Error; err != nil {

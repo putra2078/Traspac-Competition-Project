@@ -29,7 +29,7 @@ type ManagerWithContactRequest struct {
 		Status       string `json:"status"`
 		PositionID   uint   `json:"position_id"`
 		DepartmentID uint   `json:"department_id"`
-		WorkTime 	 uint 	`json:"work_time"`
+		WorkTime     uint   `json:"work_time"`
 	} `json:"manager" binding:"required"`
 
 	Contact struct {
@@ -99,7 +99,7 @@ func (h *Handler) RegisterWithContact(c *gin.Context) {
 		Status:       req.Manager.Status,
 		PositionID:   req.Manager.PositionID,
 		DepartmentID: req.Manager.DepartmentID,
-		WorkTime : 	  req.Manager.WorkTime,
+		WorkTime:     req.Manager.WorkTime,
 	}
 
 	user := &user.User{

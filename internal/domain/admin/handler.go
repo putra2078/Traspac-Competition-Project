@@ -14,7 +14,6 @@ import (
 	"gorm.io/gorm"
 )
 
-
 type Handler struct {
 	usecase UseCase
 }
@@ -24,8 +23,7 @@ func NewHandler(u UseCase) *Handler {
 }
 
 type AdminRequest struct {
-	Admin struct {
-	} `json:"admin" binding:"required"`
+	Admin struct{} `json:"admin" binding:"required"`
 
 	Contact struct {
 		Name        string `json:"name"`
@@ -60,22 +58,20 @@ func (h *Handler) RegisterWithContact(c *gin.Context) {
 	}
 
 	contactAdmin := &contact.Contact{
-		Name: 	req.Contact.Name,
-		Photo:	req.Contact.Photo,
-		Email: 	req.Contact.Email,
+		Name:        req.Contact.Name,
+		Photo:       req.Contact.Photo,
+		Email:       req.Contact.Email,
 		PhoneNumber: req.Contact.BirthDate,
-		Gender: req.Contact.Gender,
-		Address: req.Contact.Address,
-		BirthDate: birth,
+		Gender:      req.Contact.Gender,
+		Address:     req.Contact.Address,
+		BirthDate:   birth,
 	}
 
-	admin := &Admin{
-		
-	}
+	admin := &Admin{}
 
 	userAdmin := &user.User{
 		Password: req.User.Password,
-		Role: req.User.Role,
+		Role:     req.User.Role,
 	}
 
 	if err := h.usecase.RegisterWithContact(admin, contactAdmin, userAdmin); err != nil {

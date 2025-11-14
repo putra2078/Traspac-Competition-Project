@@ -87,7 +87,6 @@ func (r *repository) FindCheckinToday(employeeID uint) (*Presence, error) {
 	err := database.DB.
 		Where("employee_id = ? AND DATE(date) = ?", employeeID, today).
 		First(&presence).Error
-
 	if err != nil {
 		return nil, err
 	}
@@ -102,13 +101,11 @@ func (r *repository) FindCheckOutToday(employeeID uint) (*Presence, error) {
 		Where("date = CURRENT_DATE").
 		Where("(check_out_status = '' OR check_out_status IS NULL)").
 		First(&presence).Error
-
 	if err != nil {
 		return nil, err
 	}
 
 	return &presence, nil
-
 }
 
 func (r *repository) CreateCheckin(presence *Presence) error {

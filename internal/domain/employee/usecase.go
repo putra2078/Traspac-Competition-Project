@@ -68,7 +68,6 @@ func (u *usecase) RegisterWithContact(employee *Employee, contactEmployee *conta
 			return err
 		}
 
-
 		// set user name on User and create user and employee
 		user.Username = contactEmployee.Name
 

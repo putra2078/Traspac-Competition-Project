@@ -86,7 +86,6 @@ func (u *PresenceUseCase) Checkin(userID uint, lat float64, long float64) error 
 	}
 
 	return u.repo.CreateCheckin(presence)
-
 }
 
 func parseWorkTime(s string) (time.Time, error) {
@@ -176,5 +175,4 @@ func (u *PresenceUseCase) Checkout(userID uint, lat float64, long float64) error
 	uncheckout.CheckOutStatus = &checkOutStatus
 
 	return u.repo.CheckOut(uncheckout)
-
 }

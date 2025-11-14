@@ -30,7 +30,7 @@ type EmployeeWithContactRequest struct {
 		ManagerID    uint   `json:"manager_id"`
 		PositionID   uint   `json:"position_id"`
 		DepartmentID uint   `json:"department_id"`
-		WorkTime 	 uint 	`json:"work_time"`
+		WorkTime     uint   `json:"work_time"`
 	} `json:"employee" binding:"required"`
 
 	Contact struct {
@@ -101,7 +101,7 @@ func (h *Handler) RegisterWithContact(c *gin.Context) {
 		ManagerID:    req.Employee.ManagerID,
 		PositionID:   req.Employee.PositionID,
 		DepartmentID: req.Employee.DepartmentID,
-		WorkTime: 	  req.Employee.WorkTime,
+		WorkTime:     req.Employee.WorkTime,
 	}
 
 	user := &user.User{

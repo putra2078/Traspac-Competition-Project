@@ -1,10 +1,10 @@
-package presence 	
+package presence
 
 import (
 	"net/http"
 
-	"hrm-app/internal/response"
 	"github.com/gin-gonic/gin"
+	"hrm-app/internal/response"
 )
 
 type Handler struct {
@@ -25,8 +25,8 @@ func (h *Handler) Checkin(c *gin.Context) {
 
 	// Ambil data lokasi dan status dari body JSON
 	var req struct {
-		LatCheckIn    float64 `json:"lat_check_in"`
-		LongCheckIn   float64 `json:"long_check_in"`
+		LatCheckIn  float64 `json:"lat_check_in"`
+		LongCheckIn float64 `json:"long_check_in"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.Error(c, http.StatusBadRequest, "invalid request body")
@@ -51,8 +51,8 @@ func (h *Handler) Checkout(c *gin.Context) {
 	}
 
 	var req struct {
-		LatCheckOut 	float64 `json:"lat_check_out"`
-		LongCheckOut 	float64 `json:"long_check_out"`
+		LatCheckOut  float64 `json:"lat_check_out"`
+		LongCheckOut float64 `json:"long_check_out"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.Error(c, http.StatusBadRequest, "invalid request body")

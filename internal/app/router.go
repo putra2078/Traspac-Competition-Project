@@ -57,7 +57,6 @@ func SetupRouter(cfg *config.Config) *gin.Engine {
 		presenceUseCase := presence.NewUseCase(presenceRepo, employeeRepo, workHourRepo)
 		presenceHandler := presence.NewHandler(presenceUseCase)
 
-
 		// auth handler needs repo + cfg
 		authHandler := auth.NewHandler(userRepo, cfg)
 
