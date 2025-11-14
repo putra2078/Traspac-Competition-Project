@@ -69,7 +69,7 @@ func (u *usecase) RegisterWithContact(manager *Manager, cont *contact.Contact, u
 		}
 
 		// Set user fields and hash password
-		usr.Name = cont.Name
+		usr.Username = cont.Name
 		usr.Email = cont.Email
 		hashed, err := utils.HashPassword(usr.Password)
 		if err != nil {

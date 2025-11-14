@@ -13,7 +13,7 @@ type Repository interface {
 	FindByID(id uint) (*Manager, error)
 	FindByNIP(nip string) (*Manager, error)
 	FindByEmail(email string) (*Manager, error)
-	Update(emp *Manager) error
+	Update(manager *Manager) error
 	Delete(id uint) error
 }
 
@@ -66,8 +66,8 @@ func (r *repository) FindByEmail(email string) (*Manager, error) {
 	return &managers, nil
 }
 
-func (r *repository) Update(Manager *Manager) error {
-	return database.DB.Save(Manager).Error
+func (r *repository) Update(manager *Manager) error {
+	return database.DB.Save(manager).Error
 }
 
 func (r *repository) Delete(id uint) error {

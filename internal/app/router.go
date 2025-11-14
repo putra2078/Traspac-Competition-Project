@@ -2,11 +2,15 @@ package app
 
 import (
 	"hrm-app/config"
+	"hrm-app/internal/domain/admin"
 	"hrm-app/internal/domain/auth"
 	"hrm-app/internal/domain/department"
 	"hrm-app/internal/domain/employee"
 	"hrm-app/internal/domain/manager"
+	"hrm-app/internal/domain/presence"
 	"hrm-app/internal/domain/user"
+	"hrm-app/internal/domain/work_hour"
+	"hrm-app/internal/middleware"
 
 	"github.com/gin-gonic/gin"
 )
@@ -40,8 +44,28 @@ func SetupRouter(cfg *config.Config) *gin.Engine {
 		departmentUseCase := department.NewUseCase(departmentRepo)
 		departmentHandler := department.NewHandler(departmentUseCase)
 
+		// Admin routes
+		adminRepo := admin.NewRepository()
+		adminUseCase := admin.NewUseCase(adminRepo)
+		adminHandler := admin.NewHandler(adminUseCase)
+
+		// Work Hour routes
+		workHourRepo := work_hour.NewRepository()
+
+		// Presence routes
+		presenceRepo := presence.NewRepository()
+		presenceUseCase := presence.NewUseCase(presenceRepo, employeeRepo, workHourRepo)
+		presenceHandler := presence.NewHandler(presenceUseCase)
+
 		// auth handler needs repo + cfg
 		authHandler := auth.NewHandler(userRepo, cfg)
+
+		auth := r.Group("/api/presence")
+		auth.Use(middleware.AuthMiddleware(cfg))
+		{
+			auth.POST("/checkin", presenceHandler.Checkin)
+			auth.PUT("/checkout", presenceHandler.Checkout)
+		}
 
 		api.POST("/login", authHandler.Login)
 
@@ -73,6 +97,13 @@ func SetupRouter(cfg *config.Config) *gin.Engine {
 			department.GET("slug/:slug", departmentHandler.GetBySlug)
 			department.GET("/:id", departmentHandler.GetByID)
 			department.DELETE("/:id", departmentHandler.Delete)
+		}
+		admin := api.Group("/admins")
+		{
+			admin.POST("/", adminHandler.RegisterWithContact)
+			admin.GET("/", adminHandler.GetAll)
+			admin.GET("/:id", adminHandler.GetByID)
+			admin.DELETE("/:id", adminHandler.Delete)
 		}
 	}
 

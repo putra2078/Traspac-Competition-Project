@@ -1,4 +1,5 @@
-version: '0.1'
+# version: '3.8'  # ubah versi biar kompatibel dan stabil
+
 services:
   app:
     build: .
@@ -14,15 +15,16 @@ services:
       - postgres
 
   postgres:
-  image: postgres:latest
-  environment:
-    - POSTGRES_USER=postgres
-    - POSTGRES_PASSWORD=123456
-    - POSTGRES_DB=hrm_db
-  ports:
-    - "5432:5432"
-  volumes:
-    - postgres_data:/var/lib/postgresql/data
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=123456
+      - POSTGRES_DB=hrm_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./migrations:/migrations
 
 volumes:
   postgres_data:

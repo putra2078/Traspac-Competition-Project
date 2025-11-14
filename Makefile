@@ -1,7 +1,7 @@
 .PHONY: migrate-up migrate-down migrate-force
 
 MIGRATION_PATH=migrations
-DB_URL=postgresql://postgres:123456@localhost:5432/hrm_db?sslmode=disable
+DB_URL=postgresql://postgres:123456@localhost:5432/traspac_db?sslmode=disable
 
 # Menjalankan migrasi up
 migrate-up:
@@ -32,6 +32,9 @@ domain:
 		echo ✅ Domain '$(name)' berhasil dibuat di internal\domain\$(name) \
 	)
 
+seed:
+	psql "$(DB_URL)" -f migrations/seeders/seed_departments.sql
+	psql "$(DB_URL)" -f migrations/seeders/seed_positions.sql
 
 # Menjalankan aplikasi
 run:

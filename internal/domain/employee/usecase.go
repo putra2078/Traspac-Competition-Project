@@ -63,8 +63,13 @@ func (u *usecase) RegisterWithContact(employee *Employee, contactEmployee *conta
 			return err
 		}
 
+		// Create contact
+		if err := tx.Create(contactEmployee).Error; err != nil {
+			return err
+		}
+
 		// set user name on User and create user and employee
-		user.Name = contactEmployee.Name
+		user.Username = contactEmployee.Name
 
 		// set user email on User and create user account
 		user.Email = contactEmployee.Email

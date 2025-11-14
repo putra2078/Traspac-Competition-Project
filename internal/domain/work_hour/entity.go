@@ -1,12 +1,12 @@
-package department
+package work_hour
 
 import "time"
 
-type Department struct {
+type WorkHour struct {
 	ID        uint      `json:"id" gorm:"primaryKey"`
 	Name      string    `json:"name"`
-	Slug      string    `json:"slug"`
-	ManagerID *uint     `json:"manager_id"`
+	StartTime string    `json:"start_time"`
+	EndTime   string    `json:"end_time"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
