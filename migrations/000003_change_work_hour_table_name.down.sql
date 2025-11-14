@@ -1,0 +1,1 @@
+ALTER TABLE work_hours RENAME TO work_hour;
