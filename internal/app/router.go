@@ -7,10 +7,10 @@ import (
 	"hrm-app/internal/domain/department"
 	"hrm-app/internal/domain/employee"
 	"hrm-app/internal/domain/manager"
+	"hrm-app/internal/domain/positions"
 	"hrm-app/internal/domain/presence"
 	"hrm-app/internal/domain/user"
 	"hrm-app/internal/domain/work_hour"
-	"hrm-app/internal/domain/positions"
 	"hrm-app/internal/middleware"
 
 	"github.com/gin-gonic/gin"

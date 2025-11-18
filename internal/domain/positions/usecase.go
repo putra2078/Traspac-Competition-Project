@@ -1,4 +1,4 @@
-package positions 	
+package positions
 
 import (
 	"errors"
@@ -13,7 +13,7 @@ type UseCase interface {
 	DeleteByID(id uint) error
 }
 
-type usecase struct{
+type usecase struct {
 	repo Repository
 }
 

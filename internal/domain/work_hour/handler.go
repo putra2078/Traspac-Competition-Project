@@ -35,7 +35,7 @@ func (h *Handler) GetAll(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	
+
 	c.JSON(http.StatusOK, data)
 }
 
@@ -56,7 +56,6 @@ func (h *Handler) GetByID(c *gin.Context) {
 
 	response.Success(c, data)
 }
-
 
 func (h *Handler) Delete(c *gin.Context) {
 	idParam := c.Param("id")
