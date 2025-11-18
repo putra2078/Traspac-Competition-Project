@@ -7,6 +7,7 @@ import (
 	"hrm-app/internal/domain/department"
 	"hrm-app/internal/domain/employee"
 	"hrm-app/internal/domain/manager"
+	"hrm-app/internal/domain/positions"
 	"hrm-app/internal/domain/presence"
 	"hrm-app/internal/domain/user"
 	"hrm-app/internal/domain/work_hour"
@@ -51,6 +52,13 @@ func SetupRouter(cfg *config.Config) *gin.Engine {
 
 		// Work Hour routes
 		workHourRepo := work_hour.NewRepository()
+		workHourUseCase := work_hour.NewUseCase(workHourRepo)
+		workHourHandler := work_hour.NewHandler(workHourUseCase)
+
+		// Positions routes
+		positionsRepo := positions.NewRepository()
+		positionsUseCase := positions.NewUseCase(positionsRepo)
+		positionsHandler := positions.NewHandler(positionsUseCase)
 
 		// Presence routes
 		presenceRepo := presence.NewRepository()
@@ -68,6 +76,23 @@ func SetupRouter(cfg *config.Config) *gin.Engine {
 		}
 
 		api.POST("/login", authHandler.Login)
+
+		workHour := api.Group("/work_hours")
+		{
+			workHour.POST("/", workHourHandler.Create)
+			workHour.GET("/", workHourHandler.GetAll)
+			workHour.GET("/:id", workHourHandler.GetByID)
+			workHour.DELETE("/:id", workHourHandler.Delete)
+		}
+
+		positions := api.Group("/positions")
+		{
+			positions.POST("/", positionsHandler.Create)
+			positions.GET("/", positionsHandler.GetAll)
+			positions.GET("/:id", positionsHandler.GetByID)
+			positions.GET("departmentid/:departmentid", positionsHandler.GetByDepartmentID)
+			positions.DELETE("/:id", positionsHandler.Delete)
+		}
 
 		user := api.Group("/users")
 		{

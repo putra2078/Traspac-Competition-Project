@@ -11,6 +11,7 @@ type Repository interface {
 	Create(workHour *WorkHour) error
 	FindAll() ([]WorkHour, error)
 	FindByID(id uint) (*WorkHour, error)
+	FindByName(name string) (*WorkHour, error)
 	Update(workHour *WorkHour) error
 	Delete(id uint) error
 }
@@ -34,6 +35,13 @@ func (r *repository) FindAll() ([]WorkHour, error) {
 func (r *repository) FindByID(id uint) (*WorkHour, error) {
 	var workHour WorkHour
 	err := database.DB.First(&workHour, id).Error
+
+	return &workHour, err
+}
+
+func (r *repository) FindByName(name string) (*WorkHour, error) {
+	var workHour WorkHour
+	err := database.DB.Where("name = ?", name).First(&workHour).Error
 
 	return &workHour, err
 }
