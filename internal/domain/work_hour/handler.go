@@ -84,4 +84,3 @@ func (h *Handler) Delete(c *gin.Context) {
 
 	response.DeleteSuccess(c, "Work hour deleted successfully")
 }
-
