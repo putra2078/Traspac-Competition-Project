@@ -41,7 +41,7 @@ func (h *Handler) GetAll(c *gin.Context) {
 		return
 	}
 
-	response.Success(c, data)
+	response.GetSuccess(c, data)
 }
 
 func (h *Handler) GetByID(c *gin.Context) {
@@ -58,7 +58,7 @@ func (h *Handler) GetByID(c *gin.Context) {
 		return
 	}
 
-	response.Success(c, data)
+	response.GetSuccess(c, data)
 }
 
 func (h *Handler) GetByDepartmentID(c *gin.Context) {
@@ -74,7 +74,7 @@ func (h *Handler) GetByDepartmentID(c *gin.Context) {
 		return
 	}
 
-	response.Success(c, data)
+	response.GetSuccess(c, data)
 }
 
 func (h *Handler) Delete(c *gin.Context) {

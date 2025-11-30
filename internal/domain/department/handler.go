@@ -59,7 +59,7 @@ func (h *Handler) GetByID(c *gin.Context) {
 		return
 	}
 
-	response.Success(c, data)
+	response.GetSuccess(c, data)
 }
 
 func (h *Handler) GetBySlug(c *gin.Context) {

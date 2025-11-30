@@ -10,6 +10,8 @@ import (
 type Repository interface {
 	Create(contact *Contact) error
 	FindByEmail(email string) (*Contact, error)
+	FindByID(id uint) (*Contact, error)
+	Update(contact *Contact) (*Contact, error)
 }
 
 type repository struct{}
@@ -34,4 +36,16 @@ func (r *repository) FindByEmail(email string) (*Contact, error) {
 	}
 
 	return &contact, nil
+}
+
+func (r *repository) FindByID(id uint) (*Contact, error) {
+	var contact Contact
+	err := database.DB.First(&contact, id).Error
+
+	return &contact, err
+}
+
+func (r *repository) Update(contact *Contact) (*Contact, error) {
+	err := database.DB.Save(contact).Error
+	return contact, err
 }

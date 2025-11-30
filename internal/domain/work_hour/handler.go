@@ -22,6 +22,11 @@ func NewHandler(u UseCase) *Handler {
 func (h *Handler) Create(c *gin.Context) {
 	var workHour WorkHour
 	if err := c.ShouldBindJSON(&workHour); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := h.usecase.Register(&workHour); err != nil {
 		c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
 		return
 	}
@@ -32,11 +37,11 @@ func (h *Handler) Create(c *gin.Context) {
 func (h *Handler) GetAll(c *gin.Context) {
 	data, err := h.usecase.GetAll()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		response.ErrorInternalServer(c, "Failed to get data")
 		return
 	}
 
-	c.JSON(http.StatusOK, data)
+	response.GetSuccess(c, data)
 }
 
 func (h *Handler) GetByID(c *gin.Context) {
@@ -54,7 +59,7 @@ func (h *Handler) GetByID(c *gin.Context) {
 		return
 	}
 
-	response.Success(c, data)
+	response.GetSuccess(c, data)
 }
 
 func (h *Handler) Delete(c *gin.Context) {

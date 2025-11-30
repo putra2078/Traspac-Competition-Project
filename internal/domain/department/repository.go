@@ -35,7 +35,7 @@ func (r *repository) FindAll() ([]Department, error) {
 
 func (r *repository) FindByID(id uint) (*Department, error) {
 	var department Department
-	err := database.DB.Find(&department, id).Error
+	err := database.DB.First(&department, id).Error
 
 	return &department, err
 }
