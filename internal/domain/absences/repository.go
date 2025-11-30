@@ -1,4 +1,4 @@
-package absences 	
+package absences
 
 import (
 	"hrm-app/internal/pkg/database"
@@ -41,7 +41,7 @@ func (r *repository) FindByEmployeeID(employeeID uint) (*Absences, error) {
 	err := database.DB.Where("employee_id = ?", employeeID).Error
 
 	return &absence, err
-} 
+}
 
 func (r *repository) Update(absence *Absences) error {
 	return database.DB.Save(absence).Error

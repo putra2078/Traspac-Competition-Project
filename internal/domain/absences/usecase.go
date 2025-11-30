@@ -1,4 +1,4 @@
-package absences 	
+package absences
 
 // import (
 // 	"errors"
@@ -24,5 +24,5 @@ package absences
 // }
 
 // func (u *usecase) Create(absence *Absences) error {
-// 	existing, _ := 
+// 	existing, _ :=
 // }

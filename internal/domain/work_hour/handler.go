@@ -26,7 +26,7 @@ func (h *Handler) Create(c *gin.Context) {
 		return
 	}
 
-	if err :=h.usecase.Register(&workHour); err != nil {
+	if err := h.usecase.Register(&workHour); err != nil {
 		c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
 		return
 	}
