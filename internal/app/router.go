@@ -7,17 +7,24 @@ import (
 	"hrm-app/internal/domain/department"
 	"hrm-app/internal/domain/employee"
 	"hrm-app/internal/domain/manager"
+	"hrm-app/internal/domain/positions"
 	"hrm-app/internal/domain/presence"
 	"hrm-app/internal/domain/user"
 	"hrm-app/internal/domain/work_hour"
-	"hrm-app/internal/domain/positions"
 	"hrm-app/internal/middleware"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
 func SetupRouter(cfg *config.Config) *gin.Engine {
 	r := gin.Default()
+
+	r.Use(cors.New(cors.Config{
+		AllowOrigins: []string{"*"},
+		AllowMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders: []string{"Origin", "Content-Type", "Authorization", "Accept"},
+	}))
 
 	api := r.Group("/api/v1")
 	{
@@ -107,6 +114,10 @@ func SetupRouter(cfg *config.Config) *gin.Engine {
 			employee.GET("/", employeeHandler.GetAll)
 			employee.GET("/:id", employeeHandler.GetByID)
 			employee.DELETE("/:id", employeeHandler.Delete)
+		}
+		contact := api.Group("/contacts")
+		{
+			contact.GET("/:id", employeeHandler.GetByID)
 		}
 		manager := api.Group("/managers")
 		{

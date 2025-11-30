@@ -2,6 +2,7 @@ package positions
 
 import (
 	"errors"
+
 	"hrm-app/internal/pkg/database"
 
 	"gorm.io/gorm"

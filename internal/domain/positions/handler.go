@@ -1,4 +1,4 @@
-package positions 	
+package positions
 
 import (
 	"errors"
@@ -21,7 +21,7 @@ func NewHandler(u UseCase) *Handler {
 
 func (h *Handler) Create(c *gin.Context) {
 	var positions Positions
-	if err :=  c.ShouldBindJSON(&positions); err != nil {
+	if err := c.ShouldBindJSON(&positions); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -41,14 +41,14 @@ func (h *Handler) GetAll(c *gin.Context) {
 		return
 	}
 
-	response.Success(c, data)
+	response.GetSuccess(c, data)
 }
 
 func (h *Handler) GetByID(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil || id < 0 {
-		response.Error(c, http.StatusBadRequest ,"Invalid parameter ID")
+		response.Error(c, http.StatusBadRequest, "Invalid parameter ID")
 		return
 	}
 
@@ -58,7 +58,7 @@ func (h *Handler) GetByID(c *gin.Context) {
 		return
 	}
 
-	response.Success(c, data)
+	response.GetSuccess(c, data)
 }
 
 func (h *Handler) GetByDepartmentID(c *gin.Context) {
@@ -74,7 +74,7 @@ func (h *Handler) GetByDepartmentID(c *gin.Context) {
 		return
 	}
 
-	response.Success(c, data)
+	response.GetSuccess(c, data)
 }
 
 func (h *Handler) Delete(c *gin.Context) {

@@ -2,10 +2,11 @@
 # 🚀 AIR CONFIG for HRM APP (by Putra)
 # ======================================
 
-# Jalankan file utama
-cmd = "go run ./cmd/server/main.go"
+root = "."
+tmp_dir = "tmp"
 
-# File hasil build sementara
+[build]
+cmd = "go build -o ./tmp/main.exe ./cmd/server"
 bin = "tmp/main.exe"
 
 # Folder yang mau dipantau

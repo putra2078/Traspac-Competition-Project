@@ -15,11 +15,9 @@ type usecase struct {
 	repo Repository
 }
 
-
 func NewUseCase(repo Repository) UseCase {
 	return &usecase{repo: repo}
 }
-
 
 func (u *usecase) Register(workHour *WorkHour) error {
 	// Function pengecekan duplikasi nama
@@ -30,16 +28,13 @@ func (u *usecase) Register(workHour *WorkHour) error {
 	return u.repo.Create(workHour)
 }
 
-
 func (u *usecase) GetAll() ([]WorkHour, error) {
 	return u.repo.FindAll()
 }
 
-
 func (u *usecase) GetByID(id uint) (*WorkHour, error) {
 	return u.repo.FindByID(id)
 }
-
 
 func (u *usecase) DeleteByID(id uint) error {
 	return u.repo.Delete(id)

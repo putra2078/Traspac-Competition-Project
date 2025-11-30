@@ -31,7 +31,7 @@ func (h *Handler) Register(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"message": "User registered successfully"})
+	response.Success(c, "User registered successfully")
 }
 
 func (h *Handler) GetAll(c *gin.Context) {
@@ -41,7 +41,7 @@ func (h *Handler) GetAll(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, data)
+	response.GetSuccess(c, data)
 }
 
 func (h *Handler) GetByID(c *gin.Context) {
@@ -59,7 +59,7 @@ func (h *Handler) GetByID(c *gin.Context) {
 		return
 	}
 
-	response.Success(c, data)
+	response.GetSuccess(c, data)
 }
 
 func (h *Handler) Delete(c *gin.Context) {

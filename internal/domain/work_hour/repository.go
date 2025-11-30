@@ -19,7 +19,7 @@ type Repository interface {
 type repository struct{}
 
 func NewRepository() Repository {
-	return &repository{}	
+	return &repository{}
 }
 
 func (r *repository) Create(workHour *WorkHour) error {

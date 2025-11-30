@@ -65,6 +65,10 @@ func main() {
 	log.Println("[INFO] PostgreSQL connected successfully")
 
 	// --- Connect to Redis ---
+	database.ConnectRedis(cfg)
+	log.Println("[INFO] Redis connected successfully")
+
+	// --- Connect to Redis ---
 	// Optional: hanya jalankan jika kamu punya file redis.go
 	// database.ConnectRedis(cfg)
 	// log.Println("[INFO] Redis connected successfully")
