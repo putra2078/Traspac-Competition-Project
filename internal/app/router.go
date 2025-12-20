@@ -2,22 +2,30 @@ package app
 
 import (
 	"hrm-app/config"
-	"hrm-app/internal/domain/admin"
 	"hrm-app/internal/domain/auth"
-	"hrm-app/internal/domain/department"
-	"hrm-app/internal/domain/employee"
-	"hrm-app/internal/domain/manager"
-	"hrm-app/internal/domain/positions"
-	"hrm-app/internal/domain/presence"
+	"hrm-app/internal/domain/boards"
+	"hrm-app/internal/domain/contact"
+	"hrm-app/internal/domain/labels"
+	"hrm-app/internal/domain/taskCard"
+	"hrm-app/internal/domain/taskCardComment"
+	"hrm-app/internal/domain/taskTab"
 	"hrm-app/internal/domain/user"
-	"hrm-app/internal/domain/work_hour"
+	"hrm-app/internal/domain/workspaces"
 	"hrm-app/internal/middleware"
+	"hrm-app/internal/websocket"
 
 	"github.com/gin-gonic/gin"
 )
 
 func SetupRouter(cfg *config.Config) *gin.Engine {
 	r := gin.Default()
+
+	// Use Prometheus middleware
+	r.Use(middleware.PrometheusMiddleware())
+
+	// Initialize WebSocket Hub
+	hub := websocket.NewHub()
+	go hub.Run()
 
 	api := r.Group("/api/v1")
 	{
@@ -27,72 +35,51 @@ func SetupRouter(cfg *config.Config) *gin.Engine {
 
 		// User routes
 		userRepo := user.NewRepository()
-		userUseCase := user.NewUseCase(userRepo)
+		contactRepo := contact.NewRepository()
+		userUseCase := user.NewUseCase(userRepo, contactRepo)
 		userHandler := user.NewHandler(userUseCase)
 
-		// Employee routes
-		employeeRepo := employee.NewRepository()
-		employeeUsecase := employee.NewUseCase(employeeRepo)
-		employeeHandler := employee.NewHandler(employeeUsecase)
+		// Workspace routes
+		workspaceRepo := workspaces.NewRepository()
+		workspaceUseCase := workspaces.NewUseCase(workspaceRepo)
+		workspaceHandler := workspaces.NewHandler(workspaceUseCase)
 
-		// Manager routes
-		managerRepo := manager.NewRepository()
-		managerUseCase := manager.NewUseCase(managerRepo)
-		managerHandler := manager.NewHandler(managerUseCase)
+		// Initialize Repositories
+		boardsRepo := boards.NewRepository()
+		taskTabRepo := taskTab.NewRepository()
+		taskCardRepo := taskCard.NewRepository()
+		labelsRepo := labels.NewRepository()
 
-		// Department routes
-		departmentRepo := department.NewRepository()
-		departmentUseCase := department.NewUseCase(departmentRepo)
-		departmentHandler := department.NewHandler(departmentUseCase)
+		// Boards routes
+		boardsUseCase := boards.NewUseCase(boardsRepo, taskTabRepo, taskCardRepo)
+		boardsHandler := boards.NewHandler(boardsUseCase)
 
-		// Admin routes
-		adminRepo := admin.NewRepository()
-		adminUseCase := admin.NewUseCase(adminRepo)
-		adminHandler := admin.NewHandler(adminUseCase)
+		// TaskTab routes
+		taskTabUseCase := taskTab.NewUseCase(taskTabRepo)
+		taskTabHandler := taskTab.NewHandler(taskTabUseCase)
 
-		// Work Hour routes
-		workHourRepo := work_hour.NewRepository()
-		workHourUseCase := work_hour.NewUseCase(workHourRepo)
-		workHourHandler := work_hour.NewHandler(workHourUseCase)
+		// TaskCard routes
+		taskCardUseCase := taskCard.NewUseCase(taskCardRepo, labelsRepo)
+		taskCardHandler := taskCard.NewHandler(taskCardUseCase)
 
-		// Positions routes
-		positionsRepo := positions.NewRepository()
-		positionsUseCase := positions.NewUseCase(positionsRepo)
-		positionsHandler := positions.NewHandler(positionsUseCase)
+		// Labels routes
+		labelsUseCase := labels.NewUseCase(labelsRepo)
+		labelsHandler := labels.NewHandler(labelsUseCase)
 
-		// Presence routes
-		presenceRepo := presence.NewRepository()
-		presenceUseCase := presence.NewUseCase(presenceRepo, employeeRepo, workHourRepo)
-		presenceHandler := presence.NewHandler(presenceUseCase)
+		// TaskCardComment routes
+		taskCardCommentRepo := taskCardComment.NewRepository()
+		taskCardCommentUseCase := taskCardComment.NewUseCase(taskCardCommentRepo)
+		taskCardCommentHandler := taskCardComment.NewHandler(taskCardCommentUseCase)
+
+		// WebSocket handler
+		wsHandler := websocket.NewHandler(hub, taskCardUseCase, taskTabUseCase, taskCardCommentUseCase)
 
 		// auth handler needs repo + cfg
 		authHandler := auth.NewHandler(userRepo, cfg)
 
-		auth := r.Group("/api/presence")
-		auth.Use(middleware.AuthMiddleware(cfg))
-		{
-			auth.POST("/checkin", presenceHandler.Checkin)
-			auth.PUT("/checkout", presenceHandler.Checkout)
-		}
-
 		api.POST("/login", authHandler.Login)
-
-		workHour := api.Group("/work_hours")
-		{
-			workHour.POST("/", workHourHandler.Create)
-			workHour.GET("/", workHourHandler.GetAll)
-			workHour.GET("/:id", workHourHandler.GetByID)
-			workHour.DELETE("/:id", workHourHandler.Delete)
-		}
-
-		positions := api.Group("/positions")
-		{
-			positions.POST("/", positionsHandler.Create)
-			positions.GET("/", positionsHandler.GetAll)
-			positions.GET("/:id", positionsHandler.GetByID)
-			positions.GET("departmentid/:departmentid", positionsHandler.GetByDepartmentID)
-			positions.DELETE("/:id", positionsHandler.Delete)
-		}
+		api.POST("/logout", authHandler.Logout)
+		api.POST("/refresh-token", authHandler.RefreshToken)
 
 		user := api.Group("/users")
 		{
@@ -101,34 +88,96 @@ func SetupRouter(cfg *config.Config) *gin.Engine {
 			user.GET("/:id", userHandler.GetByID)
 			user.DELETE("/:id", userHandler.Delete)
 		}
-		employee := api.Group("/employees")
+
+		workspace := api.Group("/workspaces")
 		{
-			employee.POST("/", employeeHandler.RegisterWithContact)
-			employee.GET("/", employeeHandler.GetAll)
-			employee.GET("/:id", employeeHandler.GetByID)
-			employee.DELETE("/:id", employeeHandler.Delete)
+			// workspace.GET("/", workspaceHandler.GetAll)
+
+			protected := workspace.Group("/")
+			protected.Use(middleware.AuthMiddleware(cfg))
+			{
+				protected.POST("/", workspaceHandler.Create)
+				protected.GET("/", workspaceHandler.GetByUserID)
+				protected.GET("/:id", workspaceHandler.GetByID)
+				protected.DELETE("/:id", workspaceHandler.Delete)
+				protected.PUT("/:id", workspaceHandler.Update)
+			}
 		}
-		manager := api.Group("/managers")
+
+		boards := api.Group("/boards")
 		{
-			manager.POST("/", managerHandler.RegisterWithContact)
-			manager.GET("/", managerHandler.GetAll)
-			manager.GET("/:id", managerHandler.GetByID)
-			manager.DELETE("/:id", managerHandler.Delete)
+			protected := boards.Group("/")
+			protected.Use(middleware.AuthMiddleware(cfg))
+			{
+				protected.POST("/", boardsHandler.CreateBoard)
+				protected.GET("/", boardsHandler.GetAllBoard)
+				protected.GET("/:id", boardsHandler.GetBoardByID)
+				protected.GET("/workspace/:workspace_id", boardsHandler.GetByWorkspaceID)
+				protected.DELETE("/:id", boardsHandler.DeleteBoard)
+				protected.PUT("/:id", boardsHandler.UpdateBoard)
+			}
 		}
-		department := api.Group("/departments")
+
+		taskTab := api.Group("/task-tabs")
 		{
-			department.POST("/", departmentHandler.Register)
-			department.GET("/", departmentHandler.GetAll)
-			department.GET("slug/:slug", departmentHandler.GetBySlug)
-			department.GET("/:id", departmentHandler.GetByID)
-			department.DELETE("/:id", departmentHandler.Delete)
+			protected := taskTab.Group("/")
+			protected.Use(middleware.AuthMiddleware(cfg))
+			{
+				protected.POST("/", taskTabHandler.Create)
+				protected.GET("/", taskTabHandler.GetAll)
+				protected.GET("/:id", taskTabHandler.GetByID)
+				protected.DELETE("/:id", taskTabHandler.Delete)
+				protected.PUT("/:id", taskTabHandler.Update)
+			}
 		}
-		admin := api.Group("/admins")
+
+		taskCard := api.Group("/task-cards")
 		{
-			admin.POST("/", adminHandler.RegisterWithContact)
-			admin.GET("/", adminHandler.GetAll)
-			admin.GET("/:id", adminHandler.GetByID)
-			admin.DELETE("/:id", adminHandler.Delete)
+			protected := taskCard.Group("/")
+			protected.Use(middleware.AuthMiddleware(cfg))
+			{
+				protected.POST("/", taskCardHandler.Create)
+				protected.GET("/", taskCardHandler.GetAll)
+				protected.GET("/:id", taskCardHandler.GetByID)
+				protected.GET("/task-tab/:task_tab_id", taskCardHandler.GetByTaskTabID)
+				protected.DELETE("/:id", taskCardHandler.Delete)
+				protected.PUT("/:id", taskCardHandler.Update)
+			}
+		}
+
+		labels := api.Group("/labels")
+		{
+			protected := labels.Group("/")
+			protected.Use(middleware.AuthMiddleware(cfg))
+			{
+				protected.POST("/", labelsHandler.Create)
+				protected.GET("/", labelsHandler.GetAll)
+				protected.GET("/:id", labelsHandler.GetByID)
+				protected.DELETE("/:id", labelsHandler.Delete)
+				protected.PUT("/:id", labelsHandler.Update)
+			}
+		}
+
+		taskCardComment := api.Group("/task-card-comments")
+		{
+			protected := taskCardComment.Group("/")
+			protected.Use(middleware.AuthMiddleware(cfg))
+			{
+				protected.POST("/", taskCardCommentHandler.CreateTaskCardComment)
+				protected.GET("/", taskCardCommentHandler.GetAllTaskCardComment)
+				protected.GET("/:id", taskCardCommentHandler.GetTaskCardCommentByID)
+				protected.GET("/task-card/:task_card_id", taskCardCommentHandler.GetTaskCardCommentByTaskCardID)
+				protected.DELETE("/:id", taskCardCommentHandler.DeleteTaskCardComment)
+				protected.PUT("/:id", taskCardCommentHandler.UpdateTaskCardComment)
+			}
+		}
+
+		// WebSocket routes
+		ws := api.Group("/ws")
+		{
+			ws.GET("/task-cards", wsHandler.HandleWebSocket)
+			ws.PUT("/task-cards", wsHandler.HandleWebSocket)
+			ws.GET("/clients", wsHandler.GetConnectedClients)
 		}
 	}
 

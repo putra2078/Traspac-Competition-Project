@@ -20,13 +20,13 @@ func NewHandler(u UseCase) *Handler {
 }
 
 func (h *Handler) Register(c *gin.Context) {
-	var user User
-	if err := c.ShouldBindJSON(&user); err != nil {
+	var req RegisterRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	if err := h.usecase.Register(&user); err != nil {
+	if err := h.usecase.Register(&req); err != nil {
 		c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
 		return
 	}

@@ -39,14 +39,18 @@ import (
 
 	"hrm-app/config"
 	"hrm-app/internal/app"
+
+
 	// "hrm-app/internal/domain/contact"
 	// "hrm-app/internal/domain/department"
 	// "hrm-app/internal/domain/employee"
 	// "hrm-app/internal/domain/manager"
 	// "hrm-app/internal/domain/user"
+	// "hrm-app/internal/middleware"
 	"hrm-app/internal/pkg/database"
 
 	"github.com/gin-gonic/gin"
+	// "github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func main() {
@@ -60,14 +64,18 @@ func main() {
 	}
 	gin.SetMode(mode)
 
+	// --- Initialize Prometheus Metrics ---
+	// middleware.InitPrometheus()
+	// log.Println("[INFO] Prometheus metrics initialized")
+
 	// --- Connect to PostgreSQL ---
 	database.ConnectDatabase(cfg) // function ini sudah handle error & logging internal
 	log.Println("[INFO] PostgreSQL connected successfully")
 
 	// --- Connect to Redis ---
 	// Optional: hanya jalankan jika kamu punya file redis.go
-	// database.ConnectRedis(cfg)
-	// log.Println("[INFO] Redis connected successfully")
+	database.ConnectRedis(cfg)
+	log.Println("[INFO] Redis connected successfully")
 
 	// --- Auto Migration (hanya di mode debug) ---
 	// if gin.Mode() == gin.DebugMode {
@@ -88,6 +96,8 @@ func main() {
 	// --- Setup Gin Router ---
 	r := app.SetupRouter(cfg)
 	r.Use(gin.Recovery()) // recover dari panic
+	// --- Setup Prometheus Metrics Endpoint ---
+	// r.GET("/metrics", gin.WrapF(promhttp.Handler().ServeHTTP))
 
 	// --- Server Configuration ---
 	port := fmt.Sprintf(":%d", cfg.Server.Port)

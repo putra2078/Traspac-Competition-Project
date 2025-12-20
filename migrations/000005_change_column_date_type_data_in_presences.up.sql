@@ -1,1 +1,0 @@
-ALTER TABLE presences ALTER COLUMN date TYPE TIMESTAMP using date::timestamp;

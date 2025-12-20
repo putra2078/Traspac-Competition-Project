@@ -26,8 +26,9 @@ type Config struct {
 		Db       int
 	}
 	JWT struct {
-		Secret           string `mapstructure:"secret"`
-		ExpiresInMinutes int    `mapstructure:"expires_in_minute"`
+		Secret               string `mapstructure:"secret"`
+		ExpiresInMinutes     int    `mapstructure:"expires_in_minute"`
+		RefreshExpiresInDays int    `mapstructure:"refresh_expires_in_days"`
 	}
 }
 

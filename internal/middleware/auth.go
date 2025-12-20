@@ -12,30 +12,48 @@ import (
 
 func AuthMiddleware(cfg *config.Config) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		authHeader := c.GetHeader("Authorization")
-		if authHeader == "" {
+		tokenStr := ""
+
+		// 1. Coba ambil dari Cookie
+		if cookie, err := c.Cookie("access_token"); err == nil {
+			tokenStr = cookie
+		}
+
+		// 2. Jika tidak ada di cookie, coba ambil dari Authorization header
+		if tokenStr == "" {
+			authHeader := c.GetHeader("Authorization")
+			if authHeader != "" {
+				parts := strings.SplitN(authHeader, " ", 2)
+				if len(parts) == 2 && strings.ToLower(parts[0]) == "bearer" {
+					tokenStr = parts[1]
+				}
+			}
+		}
+
+		if tokenStr == "" {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 				"error":   "Unauthorized",
-				"message": "Missing Authorization header",
+				"message": "Authentication required",
 			})
 			return
 		}
 
-		parts := strings.SplitN(authHeader, " ", 2)
-		if len(parts) != 2 || strings.ToLower(parts[0]) != "bearer" {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-				"error":   "Unauthorized",
-				"message": "Invalid Authorization header format",
-			})
-			return
-		}
-
-		tokenStr := parts[1]
+		// 3. Validasi JWT
 		claims, err := utils.ValidateToken(cfg, tokenStr)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 				"error":   "Unauthorized",
 				"message": "Invalid or expired token",
+			})
+			return
+		}
+
+		// 4. Validasi Session di Redis
+		_, err = utils.GetSession(claims.UserID, tokenStr)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+				"error":   "Unauthorized",
+				"message": "Session expired or invalid",
 			})
 			return
 		}

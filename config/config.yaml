@@ -8,7 +8,7 @@ database:
   port: 5432
   user: postgres
   password: 123456
-  name: traspac_db
+  name: pentacore
   sslmode: disable
 
 redis:
@@ -20,4 +20,5 @@ redis:
 
 jwt:
   secret: "supersecretkey"
-  expires_in_minute: 60
+  expires_in_minute: 15
+  refresh_expires_in_days: 7

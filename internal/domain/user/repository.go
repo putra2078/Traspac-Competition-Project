@@ -53,7 +53,7 @@ func (r *usersRepository) FindByEmail(email string) (*User, error) {
 }
 
 func (r *usersRepository) Update(user *User) error {
-	return database.DB.Save(user).Error
+	return database.DB.Model(&User{ID: user.ID}).Updates(user).Error
 }
 
 func (r *usersRepository) Delete(id uint) error {
